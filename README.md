@@ -1,179 +1,256 @@
-# Gmail AI Email Processor
+# 📧 Gmail AI Email Processor
 
-This application processes emails from Gmail, analyzes them with AI, sends WhatsApp notifications, and creates calendar events automatically.
+[![Python](https://img.shields.io/badge/Python-3.11%2B-blue)](https://python.org)
+[![UV](https://img.shields.io/badge/UV-Package%20Manager-green)](https://github.com/astral-sh/uv)
+[![OpenAI](https://img.shields.io/badge/OpenAI-GPT%20Integration-orange)](https://openai.com)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## Features
+An intelligent email processing system that automatically fetches emails from Gmail, analyzes them using AI, sends WhatsApp notifications, and creates Google Calendar events with duplicate prevention.
 
-- **Email Processing**: Fetches emails from Gmail using IMAP
-- **AI Analysis**: Uses OpenAI GPT or Anthropic Claude to analyze email content
-- **WhatsApp Notifications**: Sends summaries via Twilio or CallMeBot
-- **Calendar Integration**: Creates Google Calendar events for meetings/appointments
-- **Scheduled Execution**: Runs daily at 5 PM automatically
+## 🚀 Features
 
-## Setup Instructions
+- **📨 Gmail Integration**: Secure IMAP access with OAuth2 authentication
+- **🤖 AI-Powered Analysis**: Uses OpenAI GPT models to extract events, dates, and summaries
+- **📱 WhatsApp Notifications**: Smart notifications via CallMeBot API
+- **📅 Calendar Management**: Automatic Google Calendar event creation with duplicate prevention
+- **🏗️ Modular Architecture**: Clean, maintainable code structure
+- **⚡ Modern Dependencies**: UV package manager for fast, reliable dependency management
+- **📊 Comprehensive Logging**: Detailed logging and error handling
+- **🎯 Smart Filtering**: Process emails from specific domains only
 
-### 1. Install Dependencies
+## 🏗️ Architecture
 
-**Option A: Using UV (Recommended - 10x faster)**
-```bash
-# Install UV first
-pip install uv
-
-# Install dependencies with UV
-uv sync
+```mermaid
+graph TB
+    A[Gmail IMAP] --> B[Email Processor]
+    B --> C[AI Service]
+    B --> D[WhatsApp Service]
+    B --> E[Calendar Service]
+    
+    C --> F[OpenAI GPT]
+    D --> G[CallMeBot API]
+    E --> H[Google Calendar API]
+    
+    B --> I[Logging System]
+    
+    style A fill:#f9f
+    style F fill:#ff9
+    style G fill:#9f9
+    style H fill:#99f
 ```
 
-**Option B: Using pip (Traditional)**
+## 📋 Prerequisites
+
+- Python 3.11+
+- Gmail account with 2FA and app password
+- Google Cloud Console project with Calendar API enabled
+- OpenAI API key
+- CallMeBot WhatsApp setup
+
+## ⚡ Quick Start
+
+### 1. Install UV Package Manager
+
 ```bash
-pip install -r requirements.txt
-```
+# Windows (PowerShell)
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 
-### 2. Configuration
-
-1. Copy `.env.example` to `.env`:
-   ```bash
-   copy .env.example .env
-   ```
-
-2. Fill in your credentials in the `.env` file:
-
-#### Gmail Setup
-- Enable 2-factor authentication
-- Generate an App Password: Google Account → Security → App passwords
-- Use your email and app password in the `.env` file
-
-#### AI Service (Choose one)
-- **OpenAI**: Get API key from https://platform.openai.com/
-- **Anthropic**: Get API key from https://console.anthropic.com/
-
-#### WhatsApp Service (Choose one)
-
-**Option 1: Twilio (Recommended)**
-- Sign up at https://www.twilio.com/
-- Get Account SID and Auth Token
-- Enable WhatsApp sandbox
-
-**Option 2: CallMeBot (Simpler)**
-- Add CallMeBot to WhatsApp: https://www.callmebot.com/blog/free-api-whatsapp-messages/
-- Get your API key
-
-#### Google Calendar
-- Go to Google Cloud Console
-- Enable Calendar API
-- Download `credentials.json` and place in project root
-
-### 3. Run the Application
-
-**Using UV (Recommended):**
-```bash
-# Run the application
-uv run python main.py
-
-# Install dependencies (if needed)
-uv sync
-
-# Install dev dependencies
-uv sync --extra dev
-
-# Run tests (if available)
-uv run pytest
-```
-
-**Using traditional Python:**
-```bash
-python main.py
-```
-
-## UV Package Manager
-
-This project is configured to use [UV](https://docs.astral.sh/uv/), a modern Python package manager. UV provides:
-
-- **Fast dependency resolution**: Much faster than pip
-- **Reliable builds**: Lockfile ensures reproducible environments  
-- **Modern workflow**: Built-in virtual environment management
-- **Better caching**: Faster subsequent installs
-
-### UV Installation
-
-Install UV using one of these methods:
-
-**Windows (PowerShell):**
-```powershell
-irm https://astral.sh/uv/install.ps1 | iex
-```
-
-**macOS/Linux:**
-```bash
+# macOS/Linux
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-### UV Commands for this Project
+### 2. Clone and Setup
 
 ```bash
+git clone https://github.com/YOUR_USERNAME/gmail-ai-processor.git
+cd gmail-ai-processor
+
 # Install dependencies
 uv sync
 
-# Install with dev dependencies  
+# Install with dev dependencies (optional)
 uv sync --extra dev
+```
 
-# Run the application
+### 3. Configure Environment
+
+```bash
+# Copy environment template
+cp .env.example .env
+
+# Edit .env with your credentials
+# Also download credentials.json from Google Cloud Console
+```
+
+### 4. Run the Processor
+
+```bash
+# Using UV (recommended)
 uv run python main.py
 
-# Run any Python command in the project environment
-uv run python -c "import openai; print('OpenAI available')"
-
-# Add a new dependency
-uv add requests
-
-# Add a dev dependency
-uv add --dev pytest
+# Or with tasks
+uv run --extra dev python main.py
 ```
 
-## File Structure
+## 🔧 Configuration
+
+### Environment Variables (`.env`)
+
+```bash
+# Gmail IMAP Configuration
+GMAIL_USER=your_email@gmail.com
+GMAIL_APP_PASSWORD=your_16_char_app_password
+
+# OpenAI Configuration
+OPENAI_API_KEY=sk-your_openai_api_key
+
+# WhatsApp Configuration (CallMeBot)
+CALLMEBOT_API_KEY=your_callmebot_api_key
+CALLMEBOT_PHONE=65123456789
+
+# Domain Filter
+DOMAIN_FILTER=@yourdomain.com
+
+# Google Calendar (place credentials.json in project root)
+GOOGLE_CALENDAR_CREDENTIALS_FILE=credentials.json
+GOOGLE_CALENDAR_TOKEN_FILE=token.json
+```
+
+### Required Files
+
+1. **`.env`** - Copy from `.env.example` and fill in your credentials
+2. **`credentials.json`** - Download from Google Cloud Console (Calendar API)
+
+## 📁 Project Structure
 
 ```
-GmailAI/
-├── main.py                 # Main application entry point
-├── config.py              # Configuration management
-├── email_processor.py     # Main email processing logic
-├── pyproject.toml         # UV project configuration
-├── uv.lock                # UV dependency lockfile
-├── uv.toml                # UV settings
-├── requirements.txt       # Python dependencies (legacy)
-├── .env.example          # Environment variables template
-├── README.md             # This file
-├── UV_SETUP.md           # UV setup documentation
-└── services/
-    ├── __init__.py
-    ├── email_service.py   # Gmail IMAP service
-    ├── ai_service.py      # AI processing service
-    ├── whatsapp_service.py # WhatsApp messaging service
-    └── calendar_service.py # Google Calendar service
+gmail-ai-processor/
+├── 📄 main.py                 # Entry point
+├── 📄 email_processor.py      # Main orchestrator
+├── 📄 config.py              # Configuration management
+├── 📁 services/              # Modular services
+│   ├── 📄 email_service.py    # Gmail IMAP integration
+│   ├── 📄 ai_service.py       # OpenAI GPT integration
+│   ├── 📄 whatsapp_service.py # WhatsApp notifications
+│   └── 📄 calendar_service.py # Google Calendar with duplicates prevention
+├── 📄 pyproject.toml         # UV configuration
+├── 📄 uv.lock               # Dependency lock file
+├── 📄 .env.example          # Environment template
+├── 📄 .gitignore            # Git ignore rules
+└── 📁 docs/                 # Documentation and diagrams
+    ├── 📄 architecture_diagram.puml
+    ├── 📄 sequence_diagram.puml
+    └── 📄 UV_SETUP.md
 ```
 
-## Usage
+## 🎯 Key Features Explained
 
-1. **Automatic Mode**: The application runs daily at 5 PM
-2. **Manual Mode**: Uncomment `processor.process_emails()` in `main.py` to run immediately
-3. **Testing**: Run individual services for testing
+### 🤖 AI Email Analysis
+- Extracts event details (title, date, time, location)
+- Generates concise email summaries
+- Determines if calendar events should be created
+- Handles multiple events in a single email
 
-## Customization
+### 📅 Smart Calendar Integration
+- **Duplicate Prevention**: Checks existing events before creating new ones
+- **Smart Defaults**: Uses 7 AM - 8 AM for events with missing times
+- **Timezone Support**: Handles Singapore timezone by default
+- **Batch Processing**: Creates multiple events from single emails
 
-- **Email Domain**: Change `EMAIL_DOMAIN` in `config.py`
-- **Schedule**: Modify the schedule in `main.py`
-- **AI Model**: Switch between GPT-4 and Claude in `config.py`
-- **Processing Logic**: Customize email analysis in `ai_service.py`
+### 📱 WhatsApp Notifications
+- Real-time notifications for processed emails
+- Formatted messages with email summaries
+- Calendar event creation status
+- Powered by CallMeBot API
 
-## Troubleshooting
+## 🛠️ Development
 
-1. **Gmail Authentication**: Ensure 2FA is enabled and use App Password
-2. **AI API Limits**: Check your API usage and limits
-3. **WhatsApp**: Verify phone number format and API credentials
-4. **Calendar**: Ensure credentials.json is in the correct location
+### Using Traditional Python (Alternative)
 
-## Security Notes
+```bash
+# Create virtual environment
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
 
-- Never commit `.env` file to version control
-- Keep API keys secure
-- Use environment variables for sensitive data
-- Regularly rotate API keys
+# Install dependencies
+pip install -r requirements.txt
+
+# Run
+python main.py
+```
+
+### VS Code Tasks
+
+The project includes VS Code tasks for common operations:
+- `Run Email Processor (UV)`
+- `Install Dependencies (UV)`
+- `Install Dev Dependencies (UV)`
+
+### Testing
+
+```bash
+# Test project structure
+uv run python test_structure.py
+
+# Manual testing
+uv run python main.py
+```
+
+## 📊 Monitoring & Logging
+
+- **Log File**: `email_processor.log`
+- **Log Levels**: INFO, WARNING, ERROR
+- **Features Logged**:
+  - Email processing status
+  - AI analysis results
+  - WhatsApp delivery status
+  - Calendar event creation/skipping
+  - Error tracking and debugging
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+| Issue | Solution |
+|-------|----------|
+| Gmail Authentication Failed | Enable 2FA and generate app password |
+| Google Calendar API Error | Enable Calendar API in Google Cloud Console |
+| OpenAI API Error | Check API key and billing status |
+| WhatsApp Not Sending | Verify CallMeBot setup and phone number format |
+| Duplicate Events | Check calendar service logs for duplicate detection |
+
+### Debug Steps
+
+1. Check `email_processor.log` for detailed error messages
+2. Verify all credentials in `.env` file
+3. Test individual services separately
+4. Ensure all required APIs are enabled
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🙏 Acknowledgments
+
+- [UV Package Manager](https://github.com/astral-sh/uv) for modern Python dependency management
+- [OpenAI](https://openai.com) for powerful AI capabilities
+- [CallMeBot](https://www.callmebot.com) for WhatsApp API
+- [Google Calendar API](https://developers.google.com/calendar) for calendar integration
+
+## 📞 Support
+
+- 📋 **Issues**: [GitHub Issues](https://github.com/YOUR_USERNAME/gmail-ai-processor/issues)
+- 📖 **Documentation**: Check the `docs/` folder
+- 🔍 **Debugging**: Review `email_processor.log`
+
+---
+
+⭐ **Star this repository if you find it helpful!**
