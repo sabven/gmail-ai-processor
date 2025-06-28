@@ -40,5 +40,26 @@ class Config:
     USE_SERVICE_ACCOUNT: bool = False  # Set to True if using service account instead of OAuth
     
     # Email filtering
-    EMAIL_DOMAIN: str = '@dovercourt.edu.sg'  # Changed to Dovercourt domain
+    EMAIL_DOMAIN: str = ''  # Filter emails from specific domain (e.g., '@company.com'). Leave empty for all emails
     DAYS_BACK: int = 7
+    
+    def __post_init__(self):
+        """Post-initialization to handle environment variables and validation"""
+        # Load EMAIL_DOMAIN from environment if provided
+        if os.getenv('EMAIL_DOMAIN'):
+            self.EMAIL_DOMAIN = os.getenv('EMAIL_DOMAIN')
+        
+        # Load AI_MODEL from environment if provided
+        if os.getenv('AI_MODEL'):
+            self.AI_MODEL = os.getenv('AI_MODEL')
+        
+        # Set up WhatsApp credentials (prioritize CallMeBot if available)
+        if self.CALLMEBOT_API_KEY and self.CALLMEBOT_PHONE:
+            self.WHATSAPP_API_KEY = self.CALLMEBOT_API_KEY
+            self.WHATSAPP_PHONE = self.CALLMEBOT_PHONE
+        elif self.TWILIO_ACCOUNT_SID and self.TWILIO_AUTH_TOKEN:
+            self.WHATSAPP_API_KEY = self.TWILIO_AUTH_TOKEN
+            self.WHATSAPP_PHONE = self.YOUR_WHATSAPP_NUMBER
+        else:
+            self.WHATSAPP_API_KEY = None
+            self.WHATSAPP_PHONE = None
