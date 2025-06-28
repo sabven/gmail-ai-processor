@@ -1,0 +1,20 @@
+# Email processing
+schedule
+python-dotenv
+
+# AI/LLM
+openai
+anthropic
+
+# Google Calendar
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
+google-api-python-client
+
+# WhatsApp/Messaging
+twilio
+requests
+
+# Utilities
+dataclasses

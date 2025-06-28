@@ -1,0 +1,70 @@
+@startuml Data_Flow_Diagram
+
+!theme plain
+skinparam backgroundColor #FFFFFF
+
+title Gmail AI Email Processor - Data Flow Diagram
+
+package "Input Layer" {
+    [Gmail Emails] #LightBlue
+    [Configuration] #LightGreen
+}
+
+package "Processing Layer" {
+    [Email Parser] #Yellow
+    [AI Analyzer] #Pink
+    [Event Detector] #Orange
+}
+
+package "Output Layer" {
+    [WhatsApp Notifier] #LightCyan
+    [Calendar Creator] #LightGray
+    [Logger] #Tan
+}
+
+package "External Services" {
+    cloud "Gmail IMAP\n(imap.gmail.com:993)" as Gmail
+    cloud "OpenAI GPT-4\nAnthropic Claude" as AI
+    cloud "Twilio WhatsApp\nCallMeBot API" as WhatsApp
+    cloud "Google Calendar\nAPI v3" as GCal
+}
+
+' Data flow arrows with labels
+Gmail --> [Gmail Emails] : "Fetch emails\nfrom @dcis.com\nlast 24 hours"
+[Configuration] --> [Email Parser] : "IMAP settings\nCredentials"
+[Gmail Emails] --> [Email Parser] : "Raw email data"
+
+[Email Parser] --> [AI Analyzer] : "Structured email\n{subject, from, body}"
+[AI Analyzer] --> AI : "Analysis prompt\nwith email content"
+AI --> [AI Analyzer] : "JSON response\n{gist, hasEvent, eventDetails}"
+
+[AI Analyzer] --> [Event Detector] : "AI analysis result"
+[Event Detector] --> [WhatsApp Notifier] : "Formatted summary"
+[Event Detector] --> [Calendar Creator] : "Event details\n(if detected)"
+
+[WhatsApp Notifier] --> WhatsApp : "📧 Email Summary:\nFrom: [sender]\nGist: [summary]"
+[Calendar Creator] --> GCal : "Calendar event\nwith reminders"
+
+[Email Parser] --> [Logger] : "Processing logs"
+[AI Analyzer] --> [Logger] : "AI response logs"
+[WhatsApp Notifier] --> [Logger] : "Message status"
+[Calendar Creator] --> [Logger] : "Event creation status"
+
+note top of [AI Analyzer]
+  Prompt includes:
+  • Email summarization
+  • Event detection
+  • Date/time extraction
+  • Location identification
+end note
+
+note right of [Event Detector]
+  Decision logic:
+  if (hasEvent == true):
+    → Create calendar event
+    → Add to WhatsApp message
+  else:
+    → Skip calendar creation
+end note
+
+@enduml

@@ -1,0 +1,126 @@
+@startuml Class_Diagram
+
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam classAttributeIconSize 0
+
+title Gmail AI Email Processor - Class Diagram
+
+package "Configuration" {
+    class Config {
+        +GMAIL_USER: str
+        +GMAIL_PASSWORD: str
+        +IMAP_SERVER: str
+        +IMAP_PORT: int
+        +OPENAI_API_KEY: str
+        +ANTHROPIC_API_KEY: str
+        +AI_MODEL: str
+        +TWILIO_ACCOUNT_SID: str
+        +TWILIO_AUTH_TOKEN: str
+        +CALLMEBOT_API_KEY: str
+        +GOOGLE_CALENDAR_CREDENTIALS_FILE: str
+        +EMAIL_DOMAIN: str
+        +DAYS_BACK: int
+    }
+}
+
+package "Main Processing" {
+    class EmailProcessor {
+        -config: Config
+        -email_service: EmailService
+        -ai_service: AIService
+        -whatsapp_service: WhatsAppService
+        -calendar_service: CalendarService
+        --
+        +__init__(config: Config)
+        +process_emails(): void
+        -_create_whatsapp_message(email_data: Dict, ai_result: Dict): str
+    }
+}
+
+package "Services" {
+    class EmailService {
+        -config: Config
+        --
+        +__init__(config: Config)
+        +get_emails_from_gmail(): List[Dict]
+        -_extract_email_body(email_message): str
+    }
+
+    class AIService {
+        -config: Config
+        -anthropic_client: Anthropic
+        --
+        +__init__(config: Config)
+        +process_email_with_ai(email_data: Dict): Dict
+        -_setup_clients(): void
+        -_call_openai(prompt: str): str
+        -_call_anthropic(prompt: str): str
+        -_parse_ai_response(ai_response: str, email_data: Dict): Dict
+    }
+
+    class WhatsAppService {
+        -config: Config
+        -twilio_client: Client
+        --
+        +__init__(config: Config)
+        +send_whatsapp_message(message: str): bool
+        -_setup_client(): void
+        -_send_via_twilio(message: str): bool
+        -_send_via_callmebot(message: str): bool
+    }
+
+    class CalendarService {
+        -config: Config
+        -calendar_service: Resource
+        --
+        +__init__(config: Config)
+        +create_calendar_event(event_details: Dict, email_data: Dict): bool
+        -_setup_google_calendar(): Resource
+    }
+}
+
+package "External Dependencies" {
+    class "Gmail IMAP" as Gmail <<External>>
+    class "OpenAI API" as OpenAI <<External>>
+    class "Anthropic API" as Anthropic <<External>>
+    class "Twilio API" as Twilio <<External>>
+    class "CallMeBot API" as CallMeBot <<External>>
+    class "Google Calendar API" as GoogleCal <<External>>
+}
+
+' Relationships
+EmailProcessor *-- Config : uses
+EmailProcessor *-- EmailService : contains
+EmailProcessor *-- AIService : contains
+EmailProcessor *-- WhatsAppService : contains
+EmailProcessor *-- CalendarService : contains
+
+EmailService ..> Gmail : connects to
+AIService ..> OpenAI : calls
+AIService ..> Anthropic : calls
+WhatsAppService ..> Twilio : sends via
+WhatsAppService ..> CallMeBot : sends via
+CalendarService ..> GoogleCal : creates events
+
+EmailService --> Config : reads
+AIService --> Config : reads
+WhatsAppService --> Config : reads
+CalendarService --> Config : reads
+
+note top of EmailProcessor
+    Main orchestrator that coordinates
+    all services to process emails
+    from Gmail through AI analysis
+    to WhatsApp notifications and
+    calendar event creation.
+end note
+
+note bottom of Config
+    Centralized configuration using
+    environment variables loaded
+    from .env file with dataclass
+    for type safety.
+end note
+
+@enduml

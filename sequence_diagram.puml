@@ -1,0 +1,62 @@
+@startuml Email_Processing_Flow
+
+!theme plain
+skinparam backgroundColor #FFFFFF
+
+title Email Processing Flow - Sequence Diagram
+
+actor "Scheduler" as Scheduler
+participant "main.py" as Main
+participant "email_processor.py" as Processor
+participant "email_service.py" as EmailSvc
+participant "ai_service.py" as AISvc
+participant "whatsapp_service.py" as WhatsAppSvc
+participant "calendar_service.py" as CalendarSvc
+
+database "Gmail IMAP" as Gmail
+cloud "OpenAI/Anthropic" as AI
+cloud "Twilio/CallMeBot" as WhatsApp
+cloud "Google Calendar" as GCal
+
+== Initialization ==
+Scheduler -> Main : Trigger at 5 PM
+Main -> Processor : Initialize EmailProcessor()
+Processor -> EmailSvc : Initialize services
+Processor -> AISvc : Initialize services
+Processor -> WhatsAppSvc : Initialize services
+Processor -> CalendarSvc : Initialize services
+
+== Email Processing Loop ==
+Processor -> EmailSvc : get_emails_from_gmail()
+EmailSvc -> Gmail : Connect via IMAP
+Gmail -> EmailSvc : Return email list
+EmailSvc -> Processor : Email data array
+
+loop For each email
+    Processor -> AISvc : process_email_with_ai(email_data)
+    AISvc -> AI : Send analysis prompt
+    AI -> AISvc : Return JSON response
+    AISvc -> Processor : AI analysis result
+    
+    == Parallel Processing ==
+    par WhatsApp Notification
+        Processor -> WhatsAppSvc : send_whatsapp_message(message)
+        WhatsAppSvc -> WhatsApp : API call
+        WhatsApp -> WhatsAppSvc : Success/Failure
+        WhatsAppSvc -> Processor : Status
+    else Calendar Event (if detected)
+        alt Event detected
+            Processor -> CalendarSvc : create_calendar_event(event_details)
+            CalendarSvc -> GCal : Create event
+            GCal -> CalendarSvc : Event created
+            CalendarSvc -> Processor : Success
+        end
+    end
+    
+    Processor -> Processor : Sleep 2 seconds
+end
+
+Processor -> Main : Processing complete
+Main -> Scheduler : Schedule next run
+
+@enduml

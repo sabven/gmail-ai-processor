@@ -1,0 +1,71 @@
+@startuml Gmail_AI_Email_Processor
+
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam componentStyle rectangle
+
+title Gmail AI Email Processor - System Architecture
+
+' Define components with colors
+package "Main Application" {
+    [main.py] <<Entry Point>> #LightBlue
+    [config.py] <<Configuration>> #LightGreen
+    [email_processor.py] <<Orchestrator>> #Orange
+}
+
+package "Services Layer" {
+    [email_service.py] <<Gmail IMAP>> #Yellow
+    [ai_service.py] <<AI Analysis>> #Pink
+    [whatsapp_service.py] <<Messaging>> #LightCyan
+    [calendar_service.py] <<Calendar>> #LightGray
+}
+
+package "External APIs" {
+    cloud "Gmail IMAP" as Gmail #Red
+    cloud "OpenAI/Anthropic" as AI #Purple
+    cloud "Twilio/CallMeBot" as WhatsApp #Green
+    cloud "Google Calendar" as GCal #Blue
+}
+
+package "Configuration Files" {
+    file ".env" as EnvFile #Wheat
+    file "credentials.json" as CredsFile #Wheat
+    file "token.json" as TokenFile #Wheat
+}
+
+package "Data Storage" {
+    database "Email Data" as EmailData #LightSalmon
+    database "AI Results" as AIResults #LightSalmon
+    file "email_processor.log" as LogFile #Tan
+}
+
+' Define relationships
+[main.py] --> [config.py] : loads
+[main.py] --> [email_processor.py] : initializes
+[config.py] --> EnvFile : reads
+[email_processor.py] --> [email_service.py] : uses
+[email_processor.py] --> [ai_service.py] : uses
+[email_processor.py] --> [whatsapp_service.py] : uses
+[email_processor.py] --> [calendar_service.py] : uses
+
+[email_service.py] --> Gmail : connects via IMAP
+[ai_service.py] --> AI : API calls
+[whatsapp_service.py] --> WhatsApp : sends messages
+[calendar_service.py] --> GCal : creates events
+
+[email_service.py] --> EmailData : stores
+[ai_service.py] --> AIResults : stores
+[email_processor.py] --> LogFile : writes
+
+[calendar_service.py] --> CredsFile : reads
+[calendar_service.py] --> TokenFile : manages
+
+note top of [main.py] : Scheduled to run\ndaily at 5 PM
+
+note right of Gmail : Uses App Password\nfor authentication
+
+note right of AI : Supports both\nOpenAI & Anthropic
+
+note right of WhatsApp : Multiple providers\nTwilio or CallMeBot
+
+@enduml
