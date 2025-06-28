@@ -40,5 +40,5 @@ class Config:
     USE_SERVICE_ACCOUNT: bool = False  # Set to True if using service account instead of OAuth
     
     # Email filtering
-    EMAIL_DOMAIN: str = '@dovercourt.edu.sg'  # Changed to Dovercourt domain
+    EMAIL_DOMAIN: str = '@xxxx.com'  # Changed to Dovercourt domain
     DAYS_BACK: int = 7
