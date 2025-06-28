@@ -155,8 +155,8 @@ OPENAI_API_KEY=sk-your_openai_api_key
 CALLMEBOT_API_KEY=your_callmebot_api_key
 CALLMEBOT_PHONE=65123456789
 
-# Domain Filter
-DOMAIN_FILTER=@yourdomain.com
+# Domain Filter (optional)
+EMAIL_DOMAIN=@company.com  # Filter emails from specific domain. Leave empty for all emails
 
 # Google Calendar (place credentials.json in project root)
 GOOGLE_CALENDAR_CREDENTIALS_FILE=credentials.json
