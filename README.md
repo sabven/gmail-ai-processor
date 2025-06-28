@@ -3,41 +3,58 @@
 [![Python](https://img.shields.io/badge/Python-3.11%2B-blue)](https://python.org)
 [![UV](https://img.shields.io/badge/UV-Package%20Manager-green)](https://github.com/astral-sh/uv)
 [![OpenAI](https://img.shields.io/badge/OpenAI-GPT%20Integration-orange)](https://openai.com)
+[![LangChain](https://img.shields.io/badge/LangChain-Agents-purple)](https://langchain.com)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-An intelligent email processing system that automatically fetches emails from Gmail, analyzes them using AI, sends WhatsApp notifications, and creates Google Calendar events with duplicate prevention.
+An intelligent email processing system that automatically fetches emails from Gmail, analyzes them using AI agents, sends WhatsApp notifications, and creates Google Calendar events. Now features a **modular agent-based architecture** for enhanced flexibility and scalability.
 
 ## 🚀 Features
 
+- **🤖 AI Agent Architecture**: Specialized agents for different tasks (Email, Analysis, Notification, Calendar)
 - **📨 Gmail Integration**: Secure IMAP access with OAuth2 authentication
-- **🤖 AI-Powered Analysis**: Uses OpenAI GPT models to extract events, dates, and summaries
+- **� AI-Powered Analysis**: Uses OpenAI GPT models to extract events, dates, and summaries
 - **📱 WhatsApp Notifications**: Smart notifications via CallMeBot API
 - **📅 Calendar Management**: Automatic Google Calendar event creation with duplicate prevention
-- **🏗️ Modular Architecture**: Clean, maintainable code structure
+- **🏗️ Modular Design**: Clean agent-based architecture with specialized functions
 - **⚡ Modern Dependencies**: UV package manager for fast, reliable dependency management
 - **📊 Comprehensive Logging**: Detailed logging and error handling
 - **🎯 Smart Filtering**: Process emails from specific domains only
+- **🔧 Multiple Interfaces**: Both agent-based and legacy processing modes
 
-## 🏗️ Architecture
+## 🏗️ Agent Architecture
+
+The system uses a coordinator agent that orchestrates four specialized agents:
 
 ```mermaid
 graph TB
-    A[Gmail IMAP] --> B[Email Processor]
-    B --> C[AI Service]
-    B --> D[WhatsApp Service]
-    B --> E[Calendar Service]
+    A[Gmail IMAP] --> B[📧 EmailAgent]
+    B --> C[🧠 AnalysisAgent]
+    C --> D[📱 NotificationAgent]
+    C --> E[📅 CalendarAgent]
     
-    C --> F[OpenAI GPT]
-    D --> G[CallMeBot API]
-    E --> H[Google Calendar API]
+    F[🎛️ CoordinatorAgent] --> B
+    F --> C
+    F --> D
+    F --> E
     
-    B --> I[Logging System]
+    C --> G[OpenAI GPT]
+    D --> H[CallMeBot API]
+    E --> I[Google Calendar API]
     
-    style A fill:#f9f
     style F fill:#ff9
-    style G fill:#9f9
-    style H fill:#99f
+    style B fill:#9ff
+    style C fill:#f9f
+    style D fill:#9f9
+    style E fill:#99f
 ```
+
+### Agent Responsibilities
+
+- **📧 EmailAgent**: Fetches and manages email data from Gmail
+- **🧠 AnalysisAgent**: AI-powered email analysis for summaries and event extraction
+- **📱 NotificationAgent**: Handles WhatsApp notifications and message formatting
+- **📅 CalendarAgent**: Creates and manages Google Calendar events
+- **🎛️ CoordinatorAgent**: Orchestrates the entire workflow between agents
 
 ## 📋 Prerequisites
 
@@ -84,13 +101,43 @@ cp .env.example .env
 
 ### 4. Run the Processor
 
-```bash
-# Using UV (recommended)
-uv run python main.py
+#### Agent-Based Mode (Recommended)
 
-# Or with tasks
-uv run --extra dev python main.py
+```bash
+# Run with agent architecture
+uv run python main_agent.py --mode agent --max-emails 10
+
+# Get agent system information
+uv run python main_agent.py --mode info
+
+# Run health check on all services
+uv run python main_agent.py --mode health
+
+# Run on schedule (daily at 5 PM)
+uv run python main_agent.py --mode agent --schedule
 ```
+
+#### Legacy Mode
+
+```bash
+# Run legacy processor
+uv run python main_agent.py --mode legacy
+
+# Or use the original main.py
+uv run python main.py
+```
+
+#### Command Options
+
+| Option | Description |
+|--------|-------------|
+| `--mode agent` | Use the new agent-based architecture |
+| `--mode legacy` | Use the original processor |
+| `--mode info` | Show agent system information |
+| `--mode health` | Run health check on all services |
+| `--max-emails N` | Process maximum N emails (default: 10) |
+| `--schedule` | Run on schedule instead of once |
+| `--create-env` | Create example .env file |
 
 ## 🔧 Configuration
 
@@ -125,15 +172,25 @@ GOOGLE_CALENDAR_TOKEN_FILE=token.json
 
 ```
 gmail-ai-processor/
-├── 📄 main.py                 # Entry point
-├── 📄 email_processor.py      # Main orchestrator
+├── 📄 main_agent.py           # New agent-based entry point
+├── 📄 main.py                 # Legacy entry point
+├── 📄 email_processor.py      # Legacy orchestrator
+├── 📄 agent_email_processor.py # Agent-based orchestrator
 ├── 📄 config.py              # Configuration management
-├── 📁 services/              # Modular services
+├── 📁 agents/                # Agent-based architecture
+│   ├── 📄 __init__.py
+│   ├── 📄 base_agent.py       # Base agent class
+│   ├── 📄 coordinator_agent.py # Main workflow coordinator
+│   ├── 📄 email_agent.py      # Email fetching and processing
+│   ├── 📄 analysis_agent.py   # AI-powered email analysis
+│   ├── 📄 notification_agent.py # WhatsApp notifications
+│   └── 📄 calendar_agent.py   # Calendar event management
+├── 📁 services/              # Modular services (legacy)
 │   ├── 📄 email_service.py    # Gmail IMAP integration
 │   ├── 📄 ai_service.py       # OpenAI GPT integration
 │   ├── 📄 whatsapp_service.py # WhatsApp notifications
 │   └── 📄 calendar_service.py # Google Calendar with duplicates prevention
-├── 📄 pyproject.toml         # UV configuration
+├── 📄 pyproject.toml         # UV configuration with LangChain
 ├── 📄 uv.lock               # Dependency lock file
 ├── 📄 .env.example          # Environment template
 ├── 📄 .gitignore            # Git ignore rules
@@ -145,11 +202,20 @@ gmail-ai-processor/
 
 ## 🎯 Key Features Explained
 
-### 🤖 AI Email Analysis
+### 🤖 Agent-Based Architecture
+- **Modular Design**: Each agent handles a specific responsibility
+- **Coordinated Workflow**: Coordinator agent orchestrates the entire process
+- **Specialized Functions**: Each agent provides specific functions and tools
+- **Health Monitoring**: Built-in health checks for all services
+- **Flexible Execution**: Can run individual agent functions or full workflow
+
+### 🧠 AI Email Analysis
 - Extracts event details (title, date, time, location)
 - Generates concise email summaries
 - Determines if calendar events should be created
 - Handles multiple events in a single email
+- Priority and sentiment analysis
+- Action item extraction
 
 ### 📅 Smart Calendar Integration
 - **Duplicate Prevention**: Checks existing events before creating new ones
