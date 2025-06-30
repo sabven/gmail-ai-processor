@@ -81,3 +81,6 @@ token.json
 
 # Gmail AI Processor specific
 email_processor.log
+
+# GitHub Actions
+.github/workflows/*.log
