@@ -21,7 +21,7 @@ class Config:
     # AI/LLM settings
     OPENAI_API_KEY: str = os.getenv('OPENAI_API_KEY')
     ANTHROPIC_API_KEY: str = os.getenv('ANTHROPIC_API_KEY')
-    AI_MODEL: str = 'gpt-5'  # Updated to use GPT-5 (or 'claude-3-sonnet-20240229')
+    AI_MODEL: str = os.getenv('AI_MODEL', 'gpt-4o')  # Default to gpt-4o, can be overridden via environment
     
     # WhatsApp/Twilio settings
     TWILIO_ACCOUNT_SID: str = os.getenv('TWILIO_ACCOUNT_SID')
@@ -34,8 +34,8 @@ class Config:
     CALLMEBOT_PHONE: str = os.getenv('CALLMEBOT_PHONE')  # Without + sign
     
     # CallMeBot Secondary Number
-    CALLMEBOT_API_KEY_2: str = os.getenv('CALLMEBOT_API_KEY_2', '9140025')  # Second API key
-    CALLMEBOT_PHONE_2: str = os.getenv('CALLMEBOT_PHONE_2', '6594595642')  # Second phone number
+    CALLMEBOT_API_KEY_2: str = os.getenv('CALLMEBOT_API_KEY_2')  # Second API key
+    CALLMEBOT_PHONE_2: str = os.getenv('CALLMEBOT_PHONE_2')  # Second phone number
     
     # Google Calendar settings
     GOOGLE_CALENDAR_CREDENTIALS_FILE: str = 'credentials.json'
@@ -44,19 +44,11 @@ class Config:
     USE_SERVICE_ACCOUNT: bool = False  # Set to True if using service account instead of OAuth
     
     # Email filtering
-    EMAIL_DOMAIN: str = '@dovercourt.edu.sg'  # Filter emails from specific domain (e.g., '@company.com'). Leave empty for all emails
-    DAYS_BACK: int = 1  # Check emails from last 24 hours
+    EMAIL_DOMAIN: str = os.getenv('EMAIL_DOMAIN', '@example.com')  # Filter emails from specific domain (e.g., '@company.com'). Leave empty for all emails
+    DAYS_BACK: int = int(os.getenv('DAYS_BACK', '1'))  # Check emails from last N days
     
     def __post_init__(self):
         """Post-initialization to handle environment variables and validation"""
-        # Load EMAIL_DOMAIN from environment if provided
-        if os.getenv('EMAIL_DOMAIN'):
-            self.EMAIL_DOMAIN = os.getenv('EMAIL_DOMAIN')
-        
-        # Load AI_MODEL from environment if provided
-        if os.getenv('AI_MODEL'):
-            self.AI_MODEL = os.getenv('AI_MODEL')
-        
         # Set up WhatsApp credentials (prioritize CallMeBot if available)
         if self.CALLMEBOT_API_KEY and self.CALLMEBOT_PHONE:
             self.WHATSAPP_API_KEY = self.CALLMEBOT_API_KEY
