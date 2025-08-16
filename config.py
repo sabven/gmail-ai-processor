@@ -21,7 +21,7 @@ class Config:
     # AI/LLM settings
     OPENAI_API_KEY: str = os.getenv('OPENAI_API_KEY')
     ANTHROPIC_API_KEY: str = os.getenv('ANTHROPIC_API_KEY')
-    AI_MODEL: str = 'gpt-4'  # or 'claude-3-sonnet-20240229'
+    AI_MODEL: str = 'gpt-5'  # Updated to use GPT-5 (or 'claude-3-sonnet-20240229')
     
     # WhatsApp/Twilio settings
     TWILIO_ACCOUNT_SID: str = os.getenv('TWILIO_ACCOUNT_SID')
@@ -29,9 +29,13 @@ class Config:
     TWILIO_WHATSAPP_NUMBER: str = os.getenv('TWILIO_WHATSAPP_NUMBER', 'whatsapp:+14155238886')
     YOUR_WHATSAPP_NUMBER: str = os.getenv('YOUR_WHATSAPP_NUMBER')  # e.g., 'whatsapp:+65123456789'
     
-    # Alternative: CallMeBot (simpler)
+    # Alternative: CallMeBot (simpler) - Primary Number
     CALLMEBOT_API_KEY: str = os.getenv('CALLMEBOT_API_KEY')
     CALLMEBOT_PHONE: str = os.getenv('CALLMEBOT_PHONE')  # Without + sign
+    
+    # CallMeBot Secondary Number
+    CALLMEBOT_API_KEY_2: str = os.getenv('CALLMEBOT_API_KEY_2', '9140025')  # Second API key
+    CALLMEBOT_PHONE_2: str = os.getenv('CALLMEBOT_PHONE_2', '6594595642')  # Second phone number
     
     # Google Calendar settings
     GOOGLE_CALENDAR_CREDENTIALS_FILE: str = 'credentials.json'
@@ -40,8 +44,8 @@ class Config:
     USE_SERVICE_ACCOUNT: bool = False  # Set to True if using service account instead of OAuth
     
     # Email filtering
-    EMAIL_DOMAIN: str = ''  # Filter emails from specific domain (e.g., '@company.com'). Leave empty for all emails
-    DAYS_BACK: int = 7
+    EMAIL_DOMAIN: str = '@dovercourt.edu.sg'  # Filter emails from specific domain (e.g., '@company.com'). Leave empty for all emails
+    DAYS_BACK: int = 1  # Check emails from last 24 hours
     
     def __post_init__(self):
         """Post-initialization to handle environment variables and validation"""

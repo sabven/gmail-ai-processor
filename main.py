@@ -12,15 +12,41 @@ import time
 from config import Config
 from email_processor import EmailProcessor
 
-# Setup logging
+# Setup logging with UTF-8 encoding for Unicode support
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(levelname)s - %(message)s',
     handlers=[
-        logging.FileHandler('email_processor.log'),
+        logging.FileHandler('email_processor.log', encoding='utf-8'),
         logging.StreamHandler()
     ]
 )
+
+# Configure console handler to handle Unicode properly on Windows
+console_handler = None
+for handler in logging.getLogger().handlers:
+    if isinstance(handler, logging.StreamHandler) and handler.stream.name == '<stderr>':
+        console_handler = handler
+        break
+
+if console_handler:
+    # Set encoding for console output
+    import sys
+    if sys.platform.startswith('win'):
+        try:
+            # Try to set UTF-8 encoding for Windows console
+            sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+            sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+        except:
+            # If that fails, create a custom formatter that removes problematic characters
+            class SafeFormatter(logging.Formatter):
+                def format(self, record):
+                    msg = super().format(record)
+                    # Replace problematic Unicode characters with safe alternatives
+                    return msg.encode('ascii', errors='replace').decode('ascii')
+            
+            console_handler.setFormatter(SafeFormatter('%(asctime)s - %(levelname)s - %(message)s'))
+
 logger = logging.getLogger(__name__)
 
 def create_env_file():

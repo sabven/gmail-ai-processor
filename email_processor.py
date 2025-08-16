@@ -56,14 +56,33 @@ class EmailProcessor:
         logger.info(f"Processed {len(emails)} emails successfully")
     
     def _create_whatsapp_message(self, email_data: Dict, ai_result: Dict) -> str:
-        """Create formatted WhatsApp message"""
+        """Create formatted WhatsApp message with parent action points"""
+        
+        # Build action items section
+        action_section = ""
+        if ai_result.get('actionItems') and len(ai_result['actionItems']) > 0:
+            action_items = []
+            for i, action in enumerate(ai_result['actionItems'][:3], 1):  # Limit to 3 actions for WhatsApp
+                action_items.append(f"{i}. {action}")
+            action_section = f"\n\n🎯 Parent Action Items:\n" + "\n".join(action_items)
+        
+        # Build priority indicator
+        priority_emoji = {
+            'high': '🔴 HIGH',
+            'medium': '🟡 MEDIUM', 
+            'low': '🟢 LOW'
+        }
+        priority_indicator = priority_emoji.get(ai_result.get('priority', 'medium'), '🟡 MEDIUM')
+        
         return f"""📧 Email Summary:
 
 From: {email_data['from']}
 Subject: {email_data['subject']}
 
 📝 Gist: {ai_result['gist']}
+{action_section}
 
+Priority: {priority_indicator}
 {('📅 Calendar event will be created!' if ai_result['hasEvent'] else '')}
 
 Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"""

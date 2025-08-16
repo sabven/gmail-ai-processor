@@ -24,18 +24,37 @@ class CalendarService:
             
             # Load existing token
             if os.path.exists(self.config.GOOGLE_CALENDAR_TOKEN_FILE):
-                creds = Credentials.from_authorized_user_file(
-                    self.config.GOOGLE_CALENDAR_TOKEN_FILE, 
-                    self.config.CALENDAR_SCOPES
-                )
+                try:
+                    creds = Credentials.from_authorized_user_file(
+                        self.config.GOOGLE_CALENDAR_TOKEN_FILE, 
+                        self.config.CALENDAR_SCOPES
+                    )
+                except Exception as e:
+                    logger.warning(f"Failed to load existing token: {e}")
+                    # Remove corrupted token file
+                    os.remove(self.config.GOOGLE_CALENDAR_TOKEN_FILE)
+                    creds = None
             
             # If no valid credentials, get new ones
             if not creds or not creds.valid:
                 if creds and creds.expired and creds.refresh_token:
-                    creds.refresh(Request())
-                else:
+                    try:
+                        creds.refresh(Request())
+                    except Exception as e:
+                        logger.warning(f"Failed to refresh token: {e}")
+                        # Remove expired token and try to get new credentials
+                        if os.path.exists(self.config.GOOGLE_CALENDAR_TOKEN_FILE):
+                            os.remove(self.config.GOOGLE_CALENDAR_TOKEN_FILE)
+                        creds = None
+                
+                # Get new credentials if needed
+                if not creds:
                     if not os.path.exists(self.config.GOOGLE_CALENDAR_CREDENTIALS_FILE):
                         logger.warning(f"Google Calendar credentials file not found: {self.config.GOOGLE_CALENDAR_CREDENTIALS_FILE}")
+                        logger.info("To enable Google Calendar:")
+                        logger.info("1. Go to https://console.cloud.google.com/")
+                        logger.info("2. Enable Calendar API")
+                        logger.info("3. Download credentials.json to this directory")
                         return None
                     
                     flow = InstalledAppFlow.from_client_secrets_file(
@@ -48,10 +67,13 @@ class CalendarService:
                 with open(self.config.GOOGLE_CALENDAR_TOKEN_FILE, 'w') as token:
                     token.write(creds.to_json())
             
-            return build('calendar', 'v3', credentials=creds)
+            service = build('calendar', 'v3', credentials=creds)
+            logger.info("Google Calendar service initialized successfully")
+            return service
         
         except Exception as e:
             logger.warning(f"Could not setup Google Calendar: {e}")
+            logger.info("Google Calendar service will be disabled. Email processing will continue without calendar integration.")
             return None
     
     def create_calendar_event(self, event_details, email_data: Dict) -> bool:

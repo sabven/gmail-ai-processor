@@ -7,12 +7,11 @@ authors = [
 ]
 readme = "README.md"
 requires-python = ">=3.9"
-license = {text = "MIT"}
+license = "MIT"
 keywords = ["gmail", "ai", "email", "whatsapp", "calendar", "automation"]
 classifiers = [
     "Development Status :: 4 - Beta",
-    "Intended Audience :: End Users/Desktop",
-    "License :: OSI Approved :: MIT License",
+    "Intended Audience :: End Users/Desktop", 
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -76,6 +75,12 @@ Issues = "https://github.com/sabaresh/gmail-ai-processor/issues"
 [build-system]
 requires = ["setuptools>=45", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["agents*", "services*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.json", "*.yaml", "*.yml", "*.toml"]
 
 [tool.black]
 line-length = 88
