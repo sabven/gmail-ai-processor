@@ -81,8 +81,10 @@ CALLMEBOT_PHONE=65123456789
 def main():
     """Main function to run the email processor"""
     
-    # Check if .env file exists
-    if not os.path.exists('.env'):
+    # Check if .env file exists (skip in cloud environments like GitHub Actions)
+    is_cloud_environment = os.getenv('GITHUB_ACTIONS') == 'true' or os.getenv('CI') == 'true'
+    
+    if not is_cloud_environment and not os.path.exists('.env'):
         print("No .env file found. Creating example...")
         create_env_file()
         return
