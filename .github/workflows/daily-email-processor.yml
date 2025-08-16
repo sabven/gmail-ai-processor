@@ -38,7 +38,7 @@ jobs:
         
         # AI Configuration
         OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        AI_MODEL: gpt-5
+        AI_MODEL: ${{ secrets.AI_MODEL }}
         
         # WhatsApp Configuration (Primary)
         CALLMEBOT_API_KEY: ${{ secrets.CALLMEBOT_API_KEY }}
@@ -48,8 +48,9 @@ jobs:
         CALLMEBOT_API_KEY_2: ${{ secrets.CALLMEBOT_API_KEY_2 }}
         CALLMEBOT_PHONE_2: ${{ secrets.CALLMEBOT_PHONE_2 }}
         
-        # Email Domain Filter
-        EMAIL_DOMAIN: '@dovercourt.edu.sg'
+        # Email Configuration
+        EMAIL_DOMAIN: ${{ secrets.EMAIL_DOMAIN }}
+        DAYS_BACK: ${{ secrets.DAYS_BACK }}
         
       run: |
         python main.py
