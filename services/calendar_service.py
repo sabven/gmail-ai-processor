@@ -20,6 +20,13 @@ class CalendarService:
     def _setup_google_calendar(self):
         """Setup Google Calendar API client"""
         try:
+            # Skip calendar setup in cloud environments (no browser available)
+            is_cloud_environment = os.getenv('GITHUB_ACTIONS') == 'true' or os.getenv('CI') == 'true'
+            if is_cloud_environment:
+                logger.info("Skipping Google Calendar setup in cloud environment - no browser available")
+                logger.info("Google Calendar service will be disabled. Email processing will continue without calendar integration.")
+                return None
+                
             creds = None
             
             # Load existing token

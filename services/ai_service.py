@@ -3,7 +3,6 @@
 import json
 import logging
 import openai
-from anthropic import Anthropic
 from typing import Dict
 
 logger = logging.getLogger(__name__)
@@ -16,18 +15,18 @@ class AIService:
         self._setup_clients()
     
     def _setup_clients(self):
-        """Initialize AI clients"""
+        """Initialize OpenAI client"""
+        self.openai_client = None
+        
         # OpenAI client
         if self.config.OPENAI_API_KEY:
             from openai import OpenAI
             self.openai_client = OpenAI(api_key=self.config.OPENAI_API_KEY)
-        
-        # Anthropic client
-        if self.config.ANTHROPIC_API_KEY:
-            self.anthropic_client = Anthropic(api_key=self.config.ANTHROPIC_API_KEY)
+        else:
+            logger.warning("No OpenAI API key provided. AI processing will not work.")
     
     def process_email_with_ai(self, email_data: Dict) -> Dict:
-        """Process email using AI Agent (OpenAI or Anthropic) with enhanced GPT-5 prompting"""
+        """Process email using AI Agent (OpenAI) with enhanced GPT-5 prompting"""
         
         # Enhanced prompt for better AI processing (optimized for GPT-5)
         prompt = f"""
@@ -77,10 +76,8 @@ class AIService:
         """
         
         try:
-            if self.config.AI_MODEL.startswith('gpt'):
-                ai_response = self._call_openai(prompt)
-            else:
-                ai_response = self._call_anthropic(prompt)
+            # Use OpenAI for all AI processing
+            ai_response = self._call_openai(prompt)
             
             # Parse JSON response
             return self._parse_ai_response(ai_response, email_data)
@@ -163,16 +160,6 @@ class AIService:
         except Exception as e:
             logger.error(f"OpenAI API error: {e}")
             raise e
-    
-    def _call_anthropic(self, prompt: str) -> str:
-        """Call Anthropic API"""
-        message = self.anthropic_client.messages.create(
-            model="claude-3-sonnet-20240229",
-            max_tokens=500,
-            temperature=0.3,
-            messages=[{"role": "user", "content": prompt}]
-        )
-        return message.content[0].text
     
     def _parse_ai_response(self, ai_response: str, email_data: Dict) -> Dict:
         """Parse AI response into structured format"""

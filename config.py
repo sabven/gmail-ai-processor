@@ -20,7 +20,6 @@ class Config:
     
     # AI/LLM settings
     OPENAI_API_KEY: str = os.getenv('OPENAI_API_KEY')
-    ANTHROPIC_API_KEY: str = os.getenv('ANTHROPIC_API_KEY')
     AI_MODEL: str = os.getenv('AI_MODEL', 'gpt-4o')  # Default to gpt-4o, can be overridden via environment
     
     # WhatsApp/Twilio settings

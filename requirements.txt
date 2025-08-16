@@ -4,7 +4,6 @@ python-dotenv
 
 # AI/LLM
 openai
-anthropic
 
 # Google Calendar
 google-auth
